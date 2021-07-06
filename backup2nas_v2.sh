@@ -24,9 +24,9 @@ ip_add_nas="" ## Nas ip address.
 mounted_dir="t_data" ## Directory to be mounted on nas.
 home_dir="/Users/Taiti" ## Home directory.
 mount_dir="${home_dir}/mnt/nas_iodata_1" ## Mount directory on pc.
-src_dir=$1 ## Backup source directory on pc.
+src_dir="" ## Backup source directory on pc.
 dst_dir=${mount_dir} ## Destination directory to backup data on nas.
-BACKUP_LIST="./backup_lists/$1" ## Get backup list path
+BACKUP_LIST="${home_dir}/projects/backup2nas_v2/backup_lists/$1" ## Get backup list path
 
 ### Find nas IP Address from network segment.
 ## Try all ip address in network segment.
@@ -41,9 +41,11 @@ for ip_address in `seq 200 254`;do
 done
 
 ## Sync directories
-while read target_dir_path
+while read src_dir
 do
+  umount /Volumes/${mounted_dir}
   umount ${mount_dir}   ### unmount nas
-  mount -t smbfs -w //${nas_user}:${nas_pw}@${ip_add_nas}/${mounted_dir} ${mount_dir} || exit 1   ### Mount to nas.
-  rsync -ahvr ${home_dir}/${src_dir}/ ${dst_dir}/${src_dir}/ > ${SCRIPT_DIR}/log/rsync_${src_dir}.log &  ### Sync data.
+  mount -t smbfs -w //${nas_user}:${nas_password}@${ip_add_nas}/${mounted_dir} ${mount_dir} || exit 1   ### Mount to nas.
+  rsync -ahvru ${home_dir}/$1/${src_dir} ${dst_dir}/macbook_backup/$1/ > ${SCRIPT_DIR}/log/rsync_$1.log &  ### Sync data.
+  wait $!
 done < $BACKUP_LIST

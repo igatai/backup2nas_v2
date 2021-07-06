@@ -24,9 +24,9 @@ ip_add_nas="" ## Nas ip address.
 mounted_dir="share" ## Directory to be mounted on nas.
 home_dir="/Users/Taiti" ## Home directory.
 mount_dir="${home_dir}/mnt/nas_iodata_2" ## Mount directory on pc.
-src_dir=$1 ## Backup source directory on pc.
+src_dir="" ## Backup source directory on pc.
 dst_dir=${mount_dir} ## Destination directory to backup data on nas.
-SHARE_LIST="./share_lists/$1" ## Get backup list path
+SHARE_LIST="${home_dir}/projects/backup2nas_v2/share_lists/$1" ## Get backup list path
 
 ### Find nas IP Address from network segment.
 ## Try all ip address in network segment.
@@ -41,9 +41,12 @@ for ip_address in `seq 200 254`;do
 done
 
 ## Sync directories
-while read target_dir_path
+while read src_dir
 do
+  umount /Volumes/${mounted_dir}
   umount ${mount_dir}   ### unmount nas
-  mount -t smbfs -w //${nas_user}:${nas_pw}@${ip_add_nas}/${mounted_dir} ${mount_dir}/ || exit 1   ### Mount to nas.
-  rsync -ahvr ${home_dir}/${src_dir}/ ${dst_dir}/${src_dir}/ > ${SCRIPT_DIR}/log/rsync_${src_dir}.log &  ### Sync data.
+  mount -t smbfs -w //${nas_user}:${nas_password}@${ip_add_nas}/${mounted_dir} ${mount_dir}/ || exit 1   ### Mount to nas.
+  rsync -ahvr ${home_dir}/$1/${src_dir} ${dst_dir}/$1/ > ${SCRIPT_DIR}/log/rsync_$1.log &  ### Sync data.
+# rsync -ahvr /Users/Taiti/Documents/Finance/ /Users/Taiti/mnt/nas_iodata_2/Documents/Finance/ > ${SCRIPT_DIR}/log/rsync_${src_dir}.log &  ### Sync data.
+  wait $!
 done < $SHARE_LIST
