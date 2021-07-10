@@ -20,7 +20,7 @@ SHARE_LISTS="share_lists"
 # Delete old lists
 while read DIR_NAME
 do
-  rm ./$BACKUP_LISTS/$DIR_NAME
+  rm ./$SHARE_LISTS/$DIR_NAME
 done < SHARE_TARGET_DIR_LIST
 
 # Make lists
