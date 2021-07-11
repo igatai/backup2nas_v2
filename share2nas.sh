@@ -41,11 +41,11 @@ for ip_address in `seq 200 254`;do
   fi
 done
 
-# monunt to target
-result = 0
-touch ${DIR_HOME}/${DIR_TARGET_ROUTE} || result = $?
-if [ ${result} -ne 0 ]; then
+### monunt to target
+mount_status=`mount -v | grep ${DIR_MOUNT} | wc -l`
+if [ ${mount_status} < 1 ]; then
   mount -t smbfs -w //${nas_user}:${nas_password}@${NAS_IP}/${NAS_DIR_MOUNTED} ${DIR_HOME}/${DIR_MOUNT} || exit 1   ### Mount to nas.
+  echo `mount -v`
 fi
 
 ## Sync directories
